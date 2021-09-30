@@ -1,11 +1,12 @@
 /** hardhat.config.js for ropsten **/
-
+require('@nomiclabs/hardhat-ethers');
+require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
 require("hardhat-typechain");
 require("@nomiclabs/hardhat-web3");
 require('dotenv').config();
 
-const { API_URL, PRIVATE_KEY } = process.env;
+const { API_URL, PRIVATE_KEY,  etherscanApiKey } = process.env;
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -42,10 +43,17 @@ module.exports = {
       url: API_URL,
       accounts: [PRIVATE_KEY]
     },
+    rinkeby: {
+      url: API_URL,
+      accounts: [PRIVATE_KEY]
+    },
     // rinkeby: {
     //   url: "https://rinkeby.infura.io/v3/projectid",
     //   accounts: [process.env.a2key]
     // }
+  },
+  etherscan: {
+    apiKey: etherscanApiKey
   },
   solidity: "0.8.3",
 };
