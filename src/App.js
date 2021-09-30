@@ -2,11 +2,10 @@ import './App.css';
 import { useState } from 'react';
 import { Button, InputGroup,FormControl} from 'react-bootstrap';
 import { ethers } from 'ethers'
-import Token from './artifacts/contracts/Token.sol/Token.json'
 import PPToken from './artifacts/contracts/PPToken.sol/PPToken.json'
 
 
-const tokenAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+const tokenAddress = "0x78Fa96f1a1232f3e8f1a24a8D1d733211bD1DA34"
 
 function App() {
   const [userAccount, setUserAccount] = useState()
@@ -21,7 +20,7 @@ function App() {
     if (typeof window.ethereum !== 'undefined') {
       const [account] = await window.ethereum.request({ method: 'eth_requestAccounts' })
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const contract = new ethers.Contract(tokenAddress, Token.abi, provider)
+      const contract = new ethers.Contract(tokenAddress, PPToken.abi, provider)
       const balance = await contract.balanceOf(account);
       console.log("Balance: ", balance.toString());
     }
@@ -33,8 +32,8 @@ function App() {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       console.log('window.ethereum', window.ethereum)
       console.log('provider', provider)
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(tokenAddress, Token.abi, signer);
+      const signer = provider.getSigner(0);
+      const contract = new ethers.Contract(tokenAddress, PPToken.abi, signer);
       const transaction = await contract.transfer(userAccount, amount);
       await transaction.wait();
       console.log(`${amount} Coins successfully sent to ${userAccount}`);
