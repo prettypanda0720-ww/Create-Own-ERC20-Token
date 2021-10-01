@@ -5,16 +5,22 @@ import { ethers } from 'ethers'
 import PPToken from './artifacts/contracts/PPToken.sol/PPToken.json'
 
 
-const tokenAddress = "0x78Fa96f1a1232f3e8f1a24a8D1d733211bD1DA34"
+const tokenAddress = "0xBf2Ae5F6040a79f7e094D81e362334f5f166EF03"
 
 function App() {
   const [userAccount, setUserAccount] = useState()
   const [amount, setAmount] = useState()
+  const [mintCount, setMintCount] = useState(0)
+  const [ethForMint, setEthForMint] = useState('')
+
+  function handleMint(val) {
+    setMintCount(val);
+    setEthForMint(val);
+  }
 
   async function requestAccount() {
     await window.ethereum.request({ method: 'eth_requestAccounts' });
   }
-
 
   async function getBalance() {
     if (typeof window.ethereum !== 'undefined') {
@@ -28,10 +34,8 @@ function App() {
 
   async function sendCoins() {
     if (typeof window.ethereum !== 'undefined') {
-      await requestAccount()
+      await requestAccount();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      console.log('window.ethereum', window.ethereum)
-      console.log('provider', provider)
       const signer = provider.getSigner(0);
       const contract = new ethers.Contract(tokenAddress, PPToken.abi, signer);
       const transaction = await contract.transfer(userAccount, amount);
@@ -42,8 +46,16 @@ function App() {
 
   async function mintToken() {
     if (typeof window.ethereum !== 'undefined') {
-      await requestAccount()
-    }
+      await requestAccount();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      console.log('PPToken abi', PPToken.abi);
+      console.log('signer', signer);
+      const contract = new ethers.Contract(tokenAddress, PPToken.abi, signer);
+      const transaction = await contract.mintPPT(signer.getAddress(), mintCount);
+      // const transaction = await contract.mintPPT(signer.getAddress(), mintCount, { value : ethers.utils.parseEther('0.000000001')});
+      await transaction.wait();
+    } 
   }
 
   return (
@@ -52,21 +64,22 @@ function App() {
         <header className="App-header">
           <InputGroup className="mb-3 initial-width">
             <FormControl
-              placeholder="Current Balance"
-              aria-label="Current Balance"
+              placeholder="New PPT token count"
+              aria-label="Ether Amount"
               aria-describedby="basic-addon1"
-              disabled
+              onChange={e => handleMint(e.target.value)}
             />
             <InputGroup.Text id="basic-addon1">PPT</InputGroup.Text>
           </InputGroup>
-          <hr className="divider"/>
           <InputGroup className="mb-3 initial-width">
             <FormControl
-              placeholder="Ether Amount"
-              aria-label="Ether Amount"
+              placeholder="Consume ETH"
+              aria-label="Consume ETH"
               aria-describedby="basic-addon1"
+              disabled
+              value= { ethForMint }
             />
-            <InputGroup.Text id="basic-addon1">ETH</InputGroup.Text>
+            <InputGroup.Text id="basic-addon1">gWei</InputGroup.Text>
           </InputGroup>
           <Button variant="secondary" size="md" onClick={mintToken}>
             Mint
